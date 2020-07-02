@@ -1,0 +1,9 @@
+---
+name: SkinManagerLib
+main: blugin\lib\SkinManagerLib
+version: 1.0.0
+api: [4.0.0]
+authors: ['Blugin-team', 'PresentKim']
+description: '[lib] Libraries including SkinManager'
+load: STARTUP
+...
