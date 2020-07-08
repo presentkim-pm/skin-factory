@@ -33,6 +33,13 @@ use pocketmine\network\mcpe\convert\SkinAdapterSingleton;
 use pocketmine\network\mcpe\protocol\types\SkinData;
 
 abstract class SkinManager{
+    /** @var int[] */
+    public const ACCEPTED_SKIN_SIZE_MAP = [
+        64 * 32 * 4 => [64, 32],
+        64 * 64 * 4 => [64, 64],
+        128 * 128 * 4 => [128, 128]
+    ];
+
     /** @var string[] */
     public static $skinData = [];
     /** @var string */
@@ -93,7 +100,7 @@ abstract class SkinManager{
         $width = imagesx($image);
         $height = imagesy($image);
         $size = $width * $height * 4;
-        if(!in_array($size, Skin::ACCEPTED_SKIN_SIZES, true))
+        if(!isset(self::ACCEPTED_SKIN_SIZE_MAP[$size]))
             throw new InvalidSkinException("Invalid skin data size $size bytes (allowed sizes: " . implode(", ", Skin::ACCEPTED_SKIN_SIZES) . ")");
 
         $skinData = "";
