@@ -117,4 +117,25 @@ abstract class SkinManager{
         imagedestroy($image);
         return $skinData;
     }
+
+    /**
+     * @param string $skinData
+     * @param int    $width
+     * @param int    $height
+     *
+     * @return resource
+     */
+    public static function skindata2png(string $skinData, int $width, int $height){
+        $image = imagecreatetruecolor($width, $height);
+        imagefill($image, 0, 0, imagecolorallocatealpha($image, 0, 0, 0, 127));
+        imagesavealpha($image, true);
+
+        foreach(array_chunk(array_map(function($val){
+            return ord($val);
+        }, str_split($skinData)), 4) as $index => $colorChunk){
+            $colorChunk[] = 127 - intdiv(array_pop($colorChunk), 2);
+            imagesetpixel($image, $index % $width, (int) ($index / $width), imagecolorallocatealpha($image, ...$colorChunk));
+        }
+        return $image;
+    }
 }
