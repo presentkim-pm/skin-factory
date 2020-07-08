@@ -90,17 +90,18 @@ abstract class SkinManager{
 
     /**
      * @param string $filename
+     * @param bool   $checkValid = false
      *
      * @return string Skindata
      *
      * @throws InvalidSkinException
      */
-    public static function png2skindata(string $filename) : string{
+    public static function png2skindata(string $filename, bool $checkValid = false) : string{
         $image = imagecreatefrompng($filename);
         $width = imagesx($image);
         $height = imagesy($image);
         $size = $width * $height * 4;
-        if(!isset(self::ACCEPTED_SKIN_SIZE_MAP[$size]))
+        if($checkValid && !isset(self::ACCEPTED_SKIN_SIZE_MAP[$size]))
             throw new InvalidSkinException("Invalid skin data size $size bytes (allowed sizes: " . implode(", ", Skin::ACCEPTED_SKIN_SIZES) . ")");
 
         $skinData = "";
