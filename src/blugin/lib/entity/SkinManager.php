@@ -33,7 +33,7 @@ use pocketmine\network\mcpe\convert\SkinAdapterSingleton;
 use pocketmine\network\mcpe\protocol\types\SkinData;
 
 abstract class SkinManager{
-    /** @var int[] */
+    /** @var int[][] */
     public const ACCEPTED_SKIN_SIZE_MAP = [
         64 * 32 * 4 => [64, 32],
         64 * 64 * 4 => [64, 64],
