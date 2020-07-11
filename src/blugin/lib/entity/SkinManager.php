@@ -42,9 +42,9 @@ abstract class SkinManager{
 
     /** @var string[] */
     public static $skinData = [];
-    /** @var string */
+    /** @var string[] */
     private static $geometryName = [];
-    /** @var string */
+    /** @var string[] */
     private static $geometryData = [];
     /** @var Skin[] */
     private static $skinCache = [];
