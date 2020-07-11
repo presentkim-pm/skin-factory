@@ -82,7 +82,7 @@ abstract class SkinManager{
     public static function get(string $key, $toSkinData = false){
         //Create if there is no cached Skin instance
         if(!isset(self::$skinCache[$key])){
-            self::$skinCache[$key] = new Skin("WardenMonster_" . $key, self::$skinData[$key], "", self::$geometryName[$key], self::$geometryData[$key]);
+            self::$skinCache[$key] = new Skin($key, self::$skinData[$key], "", self::$geometryName[$key], self::$geometryData[$key]);
         }
         $skin = clone self::$skinCache[$key];
         return $toSkinData ? SkinAdapterSingleton::get()->toSkinData($skin) : $skin;
