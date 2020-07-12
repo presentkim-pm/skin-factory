@@ -56,8 +56,7 @@ abstract class SkinManager{
      */
     public static function registerGeometry(string $key, string $geometryData, string $geometryName = null) : void{
         self::$geometryData[$key] = $geometryData;
-        self::$geometryName[$key] = $geometryName ?? array_keys(json_decode($geometryData, true))[0];
-
+        self::$geometryName[$key] = $geometryName ?? self::getGeometryNameFromData(json_decode($geometryData, true));
         //Removes cached Skin instance when skin changes
         unset(self::$skinCache[$key]);
     }
@@ -148,5 +147,35 @@ abstract class SkinManager{
             imagesetpixel($image, $index % $width, (int) ($index / $width), imagecolorallocatealpha($image, ...$colorChunk));
         }
         return !$checkValid || $valid ? $image : null;
+    }
+
+    /**
+     * @param array $data
+     *
+     * @return string
+     *
+     * @throw InvalidSkinException
+     */
+    public static function getGeometryNameFromData(array $data) : string{
+        $formatVersion = $data["format_version"] ?? null;
+        $keys = array_keys($data);
+        if($formatVersion === null){
+            return $keys[0] ?? "undefined";
+        }else{
+            unset($data["format_version"]);
+        }
+
+        try{
+            switch($formatVersion){
+                case "1.8.0":
+                case "1.10.0":
+                    return $keys[0];
+                case "1.12.0":
+                    return $data["minecraft:geometry"][0]["description"]["identifier"];
+            }
+        }catch(\Exception $e){
+            throw new InvalidSkinException("Invalid geometry data (format_version: $formatVersion)");
+        }
+        return "undefined";
     }
 }
