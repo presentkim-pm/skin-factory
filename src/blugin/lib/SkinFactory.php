@@ -46,6 +46,13 @@ class SkinFactory extends PluginBase{
     private $cachedSkinData = [];
 
     /**
+     * Called when the plugin is loaded, before calling onEnable()
+     */
+    public function onLoad() : void{
+        self::setInstance($this);
+    }
+
+    /**
      * @param string    $key
      * @param SkinImage $skinImage
      */
