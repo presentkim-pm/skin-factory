@@ -96,16 +96,19 @@ class SkinFactory extends PluginBase{
     }
 
     /**
-     * @param string $skinImageKey
-     * @param string $geometryDataKey
+     * @param string      $skinImageKey
+     * @param null|string $geometryDataKey = null
      *
      * @return null|SkinData
      */
-    public function get(string $skinImageKey, string $geometryDataKey) : ?SkinData{
+    public function get(string $skinImageKey, ?string $geometryDataKey = null) : ?SkinData{
         $skinImage = $this->skinImages[$skinImageKey] ?? null;
         if(!$skinImage)
             return null;
 
+        if(!$geometryDataKey){
+            $geometryDataKey = $skinImageKey;
+        }
         $geometryData = $this->geometryDatas[$geometryDataKey] ?? null;
         if(!$geometryData)
             return null;
