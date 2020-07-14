@@ -25,15 +25,20 @@
 
 declare(strict_types=1);
 
-namespace blugin\lib\entity;
+namespace blugin\lib;
 
 use pocketmine\entity\InvalidSkinException;
 use pocketmine\entity\Skin;
 use pocketmine\network\mcpe\protocol\types\SkinData;
 use pocketmine\network\mcpe\protocol\types\SkinImage;
+use pocketmine\plugin\PluginBase;
+use pocketmine\utils\SingletonTrait;
+use pocketmine\utils\TextFormat;
 use pocketmine\utils\VersionString;
 
-abstract class SkinManager{
+class SkinFactory extends PluginBase{
+    use SingletonTrait;
+
     /** @var int[][] */
     public const ACCEPTED_SKIN_SIZE_MAP = [
         64 * 32 * 4 => [64, 32],
@@ -41,49 +46,34 @@ abstract class SkinManager{
         128 * 128 * 4 => [128, 128]
     ];
 
-    /** @var string[] */
-    public static $skinData = [];
-    /** @var string[] */
-    private static $geometryName = [];
-    /** @var string[] */
-    private static $geometryData = [];
     /** @var SkinData[] */
-    private static $skinCache = [];
-
-    /**
-     * @param string      $key
-     * @param string      $geometryData
-     * @param null|string $geometryName = null
-     */
-    public static function registerGeometry(string $key, string $geometryData, string $geometryName = null) : void{
-        self::$geometryData[$key] = $geometryData;
-        self::$geometryName[$key] = $geometryName ?? self::getGeometryNameFromData(json_decode($geometryData, true));
-        //Removes cached Skin instance when skin changes
-        unset(self::$skinCache[$key]);
-    }
+    private $skinData = [];
 
     /**
      * @param string $key
      * @param string $skinData
+     * @param string $geometryData
      */
-    public static function registerSkin(string $key, string $skinData) : void{
-        self::$skinData[$key] = $skinData;
+    public function registerFromData(string $key, string $skinData, string $geometryData) : void{
+        $resourcePatch = json_encode(["geometry" => ["default" => self::getGeometryNameFromData(json_decode($geometryData, true))]]);
+        $this->register($key, new SkinData($key, $resourcePatch, SkinImage::fromLegacy($skinData), [], null, $geometryData));
+    }
 
-        //Removes cached Skin instance when skin changes
-        unset(self::$skinCache[$key]);
+    /**
+     * @param string   $key
+     * @param SkinData $skinData
+     */
+    public function register(string $key, SkinData $skinData) : void{
+        $this->skinData[$key] = $skinData;
     }
 
     /**
      * @param string $key
      *
-     * @return SkinData
+     * @return null|SkinData
      */
-    public static function get(string $key) : SkinData{
-        //Create if there is no cached Skin instance
-        if(!isset(self::$skinCache[$key])){
-            self::$skinCache[$key] = new SkinData($key, json_encode(["geometry" => ["default" => self::$geometryName[$key]]]), SkinImage::fromLegacy(self::$skinData[$key]), [], null, self::$geometryData[$key]);
-        }
-        return clone self::$skinCache[$key];
+    public function get(string $key) : ?SkinData{
+        return $this->skinData[$key] ?? null;
     }
 
     /**
@@ -94,7 +84,7 @@ abstract class SkinManager{
      *
      * @throws InvalidSkinException
      */
-    public static function png2skindata(string $filename, bool $checkValid = false) : string{
+    public function png2skindata(string $filename, bool $checkValid = false) : string{
         $image = imagecreatefrompng($filename);
         $width = imagesx($image);
         $height = imagesy($image);
@@ -125,7 +115,7 @@ abstract class SkinManager{
      *
      * @return resource|null
      */
-    public static function skindata2png(string $skinData, int $width, int $height, bool $checkValid = false){
+    public function skindata2png(string $skinData, int $width, int $height, bool $checkValid = false){
         $image = imagecreatetruecolor($width, $height);
         imagefill($image, 0, 0, imagecolorallocatealpha($image, 0, 0, 0, 127));
         imagesavealpha($image, true);
@@ -155,7 +145,7 @@ abstract class SkinManager{
      *
      * @throw InvalidSkinException
      */
-    public static function getGeometryNameFromData(array $data) : string{
+    public function getGeometryNameFromData(array $data) : string{
         $formatVersion = $data["format_version"] ?? null;
         $keys = array_keys($data);
         if($formatVersion === null){
@@ -174,6 +164,5 @@ abstract class SkinManager{
         }catch(\Exception $e){
             throw new InvalidSkinException("Invalid geometry data (format_version: $formatVersion)");
         }
-        return "undefined";
     }
 }
