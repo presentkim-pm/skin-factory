@@ -30,7 +30,7 @@ namespace blugin\lib;
 use pocketmine\plugin\PluginBase;
 use pocketmine\utils\TextFormat;
 
-class SkinManagerLib extends PluginBase{
+class SkinFactory extends PluginBase{
     /**
      * Called when the plugin is loaded, before calling onEnable()
      */

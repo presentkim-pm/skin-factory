@@ -1,9 +1,9 @@
 ---
-name: SkinManagerLib
-main: blugin\lib\SkinManagerLib
+name: SkinFactory
+main: blugin\lib\SkinFactory
 version: 1.0.0
 api: [4.0.0]
 authors: ['Blugin-team', 'PresentKim']
-description: '[lib] Libraries including SkinManager'
+description: '[lib] SkinFactory'
 load: STARTUP
 ...
