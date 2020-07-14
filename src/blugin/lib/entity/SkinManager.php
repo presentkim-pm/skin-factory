@@ -78,7 +78,7 @@ abstract class SkinManager{
      *
      * @return SkinData
      */
-    public static function get(string $key){
+    public static function get(string $key) : SkinData{
         //Create if there is no cached Skin instance
         if(!isset(self::$skinCache[$key])){
             self::$skinCache[$key] = new SkinData($key, json_encode(["geometry" => ["default" => self::$geometryName[$key]]]), SkinImage::fromLegacy(self::$skinData[$key]), [], null, self::$geometryData[$key]);
