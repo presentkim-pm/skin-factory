@@ -36,14 +36,13 @@ class PngSkinConverter{
     use SingletonTrait;
 
     /**
-     * @param resource $png
+     * @param resource $image
      *
      * @return SkinImage
      *
      * @throws InvalidSkinException
      */
-    public function toSkinImage($png) : SkinImage{
-        $image = imagecreatefrompng($png);
+    public function toSkinImage($image) : SkinImage{
         $height = imagesy($image);
         $width = imagesx($image);
 
