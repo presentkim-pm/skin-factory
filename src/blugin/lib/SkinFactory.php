@@ -32,10 +32,13 @@ use pocketmine\entity\Skin;
 use pocketmine\network\mcpe\protocol\types\SkinData;
 use pocketmine\network\mcpe\protocol\types\SkinImage;
 use pocketmine\plugin\PluginBase;
+use pocketmine\utils\SingletonTrait;
 use pocketmine\utils\TextFormat;
 use pocketmine\utils\VersionString;
 
 class SkinFactory extends PluginBase{
+    use SingletonTrait;
+
     /** @var int[][] */
     public const ACCEPTED_SKIN_SIZE_MAP = [
         64 * 32 * 4 => [64, 32],
@@ -44,7 +47,7 @@ class SkinFactory extends PluginBase{
     ];
 
     /** @var SkinData[] */
-    private static $skinData = [];
+    private $skinData = [];
 
     /**
      * Called when the plugin is loaded, before calling onEnable()
@@ -58,8 +61,8 @@ class SkinFactory extends PluginBase{
      * @param string $skinData
      * @param string $geometryData
      */
-    public static function registerFromData(string $key, string $skinData, string $geometryData) : void{
-        self::register($key, new SkinData(
+    public function registerFromData(string $key, string $skinData, string $geometryData) : void{
+        $this->register($key, new SkinData(
             $key,
             json_encode(["geometry" => ["default" => self::getGeometryNameFromData(json_decode($geometryData, true))]]),
             SkinImage::fromLegacy($skinData),
@@ -73,8 +76,8 @@ class SkinFactory extends PluginBase{
      * @param string   $key
      * @param SkinData $skinData
      */
-    public static function register(string $key, SkinData $skinData) : void{
-        self::$skinData[$key] = $skinData;
+    public function register(string $key, SkinData $skinData) : void{
+        $this->skinData[$key] = $skinData;
     }
 
     /**
@@ -82,8 +85,8 @@ class SkinFactory extends PluginBase{
      *
      * @return null|SkinData
      */
-    public static function get(string $key) : ?SkinData{
-        return self::$skinData[$key] ?? null;
+    public function get(string $key) : ?SkinData{
+        return $this->skinData[$key] ?? null;
     }
 
     /**
@@ -94,7 +97,7 @@ class SkinFactory extends PluginBase{
      *
      * @throws InvalidSkinException
      */
-    public static function png2skindata(string $filename, bool $checkValid = false) : string{
+    public function png2skindata(string $filename, bool $checkValid = false) : string{
         $image = imagecreatefrompng($filename);
         $width = imagesx($image);
         $height = imagesy($image);
@@ -125,7 +128,7 @@ class SkinFactory extends PluginBase{
      *
      * @return resource|null
      */
-    public static function skindata2png(string $skinData, int $width, int $height, bool $checkValid = false){
+    public function skindata2png(string $skinData, int $width, int $height, bool $checkValid = false){
         $image = imagecreatetruecolor($width, $height);
         imagefill($image, 0, 0, imagecolorallocatealpha($image, 0, 0, 0, 127));
         imagesavealpha($image, true);
@@ -155,7 +158,7 @@ class SkinFactory extends PluginBase{
      *
      * @throw InvalidSkinException
      */
-    public static function getGeometryNameFromData(array $data) : string{
+    public function getGeometryNameFromData(array $data) : string{
         $formatVersion = $data["format_version"] ?? null;
         $keys = array_keys($data);
         if($formatVersion === null){
