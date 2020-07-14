@@ -50,13 +50,6 @@ class SkinFactory extends PluginBase{
     private $skinData = [];
 
     /**
-     * Called when the plugin is loaded, before calling onEnable()
-     */
-    public function onLoad() : void{
-        $this->getServer()->getLogger()->debug(TextFormat::AQUA . "[Blugin/lib] SkinManagerLib is loaded");
-    }
-
-    /**
      * @param string $key
      * @param string $skinData
      * @param string $geometryData
