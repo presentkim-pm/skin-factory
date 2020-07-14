@@ -33,7 +33,6 @@ use pocketmine\network\mcpe\protocol\types\SkinData;
 use pocketmine\network\mcpe\protocol\types\SkinImage;
 use pocketmine\plugin\PluginBase;
 use pocketmine\utils\SingletonTrait;
-use pocketmine\utils\TextFormat;
 use pocketmine\utils\VersionString;
 
 class SkinFactory extends PluginBase{
@@ -46,34 +45,69 @@ class SkinFactory extends PluginBase{
         128 * 128 * 4 => [128, 128]
     ];
 
-    /** @var SkinData[] */
-    private $skinData = [];
+    /** @var SkinImage[] key => skin image */
+    private $skinImages = [];
+    /** @var string[] key => geometry data */
+    private $geometryDatas = [];
+
+    /** @var SkinData[] key => cached skin data instance */
+    private $cachedSkinData = [];
 
     /**
-     * @param string $key
-     * @param string $skinData
-     * @param string $geometryData
+     * @param string    $key
+     * @param SkinImage $skinImage
      */
-    public function registerFromData(string $key, string $skinData, string $geometryData) : void{
-        $resourcePatch = json_encode(["geometry" => ["default" => self::getGeometryNameFromData(json_decode($geometryData, true))]]);
-        $this->register($key, new SkinData($key, $resourcePatch, SkinImage::fromLegacy($skinData), [], null, $geometryData));
-    }
-
-    /**
-     * @param string   $key
-     * @param SkinData $skinData
-     */
-    public function register(string $key, SkinData $skinData) : void{
-        $this->skinData[$key] = $skinData;
+    public function registerImage(string $key, SkinImage $skinImage) : void{
+        $this->skinImages[$key] = $skinImage;
     }
 
     /**
      * @param string $key
      *
+     * @return SkinImage|null
+     */
+    public function getImage(string $key) : ?SkinImage{
+        return $this->skinImages[$key] ?? null;
+    }
+
+    /**
+     * @param string $key
+     * @param string $geometryData
+     */
+    public function registerGeometry(string $key, string $geometryData) : void{
+        $this->geometryDatas[$key] = $geometryData;
+    }
+
+    /**
+     * @param string $key
+     *
+     * @return string|null
+     */
+    public function getGeometry(string $key) : ?string{
+        return $this->geometryDatas[$key] ?? null;
+    }
+
+    /**
+     * @param string $skinImageKey
+     * @param string $geometryDataKey
+     *
      * @return null|SkinData
      */
-    public function get(string $key) : ?SkinData{
-        return $this->skinData[$key] ?? null;
+    public function get(string $skinImageKey, string $geometryDataKey) : ?SkinData{
+        $skinImage = $this->skinImages[$skinImageKey] ?? null;
+        if(!$skinImage)
+            return null;
+
+        $geometryData = $this->geometryDatas[$geometryDataKey] ?? null;
+        if(!$geometryData)
+            return null;
+
+        $cacheKey = "$skinImageKey\\$geometryDataKey";
+        if(!isset($this->cachedSkinData[$cacheKey])){
+            $resourcePatch = json_encode(["geometry" => ["default" => self::getGeometryNameFromData(json_decode($geometryData, true))]]);
+            $this->cachedSkinData[$cacheKey] = new SkinData($skinImageKey, $resourcePatch, $skinImage, [], null, $geometryData);
+        }
+        return clone $this->cachedSkinData[$cacheKey];
     }
 
     /**
