@@ -62,14 +62,8 @@ class SkinFactory extends PluginBase{
      * @param string $geometryData
      */
     public function registerFromData(string $key, string $skinData, string $geometryData) : void{
-        $this->register($key, new SkinData(
-            $key,
-            json_encode(["geometry" => ["default" => self::getGeometryNameFromData(json_decode($geometryData, true))]]),
-            SkinImage::fromLegacy($skinData),
-            [],
-            null,
-            $geometryData
-        ));
+        $resourcePatch = json_encode(["geometry" => ["default" => self::getGeometryNameFromData(json_decode($geometryData, true))]]);
+        $this->register($key, new SkinData($key, $resourcePatch, SkinImage::fromLegacy($skinData), [], null, $geometryData));
     }
 
     /**
