@@ -51,9 +51,9 @@ abstract class SkinManager{
     private static $skinCache = [];
 
     /**
-     * @param string $key
-     * @param string $geometryData
-     * @param string $geometryName = null
+     * @param string      $key
+     * @param string      $geometryData
+     * @param null|string $geometryName = null
      */
     public static function registerGeometry(string $key, string $geometryData, string $geometryName = null) : void{
         self::$geometryData[$key] = $geometryData;
@@ -76,7 +76,7 @@ abstract class SkinManager{
     /**
      * @param string $key
      *
-     * @return Skin|SkinData
+     * @return SkinData
      */
     public static function get(string $key){
         //Create if there is no cached Skin instance
