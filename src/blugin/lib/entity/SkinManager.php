@@ -31,6 +31,7 @@ use pocketmine\entity\InvalidSkinException;
 use pocketmine\entity\Skin;
 use pocketmine\network\mcpe\protocol\types\SkinData;
 use pocketmine\network\mcpe\protocol\types\SkinImage;
+use pocketmine\utils\VersionString;
 
 abstract class SkinManager{
     /** @var int[][] */
@@ -164,12 +165,11 @@ abstract class SkinManager{
         }
 
         try{
-            switch($formatVersion){
-                case "1.8.0":
-                case "1.10.0":
-                    return $keys[0];
-                case "1.12.0":
-                    return $data["minecraft:geometry"][0]["description"]["identifier"];
+            $version = new VersionString($formatVersion);
+            if($version->compare(new VersionString("1.12.0")) === 1){ //format version < 1.12.0
+                return $keys[0];
+            }else{
+                return $data["minecraft:geometry"][0]["description"]["identifier"];
             }
         }catch(\Exception $e){
             throw new InvalidSkinException("Invalid geometry data (format_version: $formatVersion)");
