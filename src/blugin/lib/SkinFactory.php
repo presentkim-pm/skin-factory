@@ -28,7 +28,6 @@ declare(strict_types=1);
 namespace blugin\lib;
 
 use pocketmine\entity\InvalidSkinException;
-use pocketmine\entity\Skin;
 use pocketmine\network\mcpe\protocol\types\SkinData;
 use pocketmine\network\mcpe\protocol\types\SkinImage;
 use pocketmine\plugin\PluginBase;
@@ -56,6 +55,14 @@ class SkinFactory extends PluginBase{
 
     /**
      * @param string $key
+     * @param string $filepath
+     */
+    public function registerImageFromFile(string $key, string $filepath) : void{
+        $this->registerImage($key, PngSkinConverter::getInstance()->toSkinImage(imagecreatefrompng($filepath)));
+    }
+
+    /**
+     * @param string $key
      *
      * @return SkinImage|null
      */
@@ -69,6 +76,14 @@ class SkinFactory extends PluginBase{
      */
     public function registerGeometry(string $key, string $geometryData) : void{
         $this->geometryDatas[$key] = $geometryData;
+    }
+
+    /**
+     * @param string $key
+     * @param string $filepath
+     */
+    public function registerGeometryFromFile(string $key, string $filepath) : void{
+        $this->registerGeometry($key, file_get_contents($filepath));
     }
 
     /**
