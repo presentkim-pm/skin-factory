@@ -27,6 +27,7 @@ declare(strict_types=1);
 
 namespace blugin\lib;
 
+use blugin\lib\conveter\PngSkinConverter;
 use pocketmine\entity\InvalidSkinException;
 use pocketmine\network\mcpe\protocol\types\SkinData;
 use pocketmine\network\mcpe\protocol\types\SkinImage;
