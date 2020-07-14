@@ -28,7 +28,6 @@ declare(strict_types=1);
 namespace blugin\lib;
 
 use pocketmine\entity\InvalidSkinException;
-use pocketmine\entity\Skin;
 use pocketmine\network\mcpe\protocol\types\SkinData;
 use pocketmine\network\mcpe\protocol\types\SkinImage;
 use pocketmine\utils\SingletonTrait;
@@ -36,28 +35,17 @@ use pocketmine\utils\SingletonTrait;
 class PngSkinConverter{
     use SingletonTrait;
 
-    /** @var int[][] */
-    public const ACCEPTED_SKIN_SIZE_MAP = [
-        64 * 32 * 4 => [64, 32],
-        64 * 64 * 4 => [64, 64],
-        128 * 128 * 4 => [128, 128]
-    ];
-
     /**
      * @param resource $png
-     * @param bool     $checkValid = false
      *
      * @return SkinImage
      *
      * @throws InvalidSkinException
      */
-    public function toSkinImage($png, bool $checkValid = false) : SkinImage{
+    public function toSkinImage($png) : SkinImage{
         $image = imagecreatefrompng($png);
         $height = imagesy($image);
         $width = imagesx($image);
-        $size = $width * $height * 4;
-        if($checkValid && !isset(self::ACCEPTED_SKIN_SIZE_MAP[$size]))
-            throw new InvalidSkinException("Invalid skin data size $size bytes (allowed sizes: " . implode(", ", Skin::ACCEPTED_SKIN_SIZES) . ")");
 
         $skinData = "";
         for($y = 0; $y < $height; $y++){
@@ -76,33 +64,23 @@ class PngSkinConverter{
 
     /**
      * @param SkinImage $skinImage
-     * @param bool      $checkValid = false
      *
      * @return resource|null
      */
-    public function fromSkinImage(SkinImage $skinImage, bool $checkValid = false){
+    public function fromSkinImage(SkinImage $skinImage){
         $width = $skinImage->getWidth();
         $height = $skinImage->getHeight();
         $image = imagecreatetruecolor($width, $height);
         imagefill($image, 0, 0, imagecolorallocatealpha($image, 0, 0, 0, 127));
         imagesavealpha($image, true);
 
-        $firstChunk = null;
-        $valid = false;
         foreach(array_chunk(array_map(function($val){
             return ord($val);
         }, str_split($skinImage->getData())), 4) as $index => $colorChunk){
-            if($checkValid){
-                if($firstChunk === null){
-                    $firstChunk = $colorChunk;
-                }else if($firstChunk !== $colorChunk){
-                    $valid = true;
-                }
-            }
             $colorChunk[] = 127 - intdiv(array_pop($colorChunk), 2);
             imagesetpixel($image, $index % $width, (int) ($index / $width), imagecolorallocatealpha($image, ...$colorChunk));
         }
-        return !$checkValid || $valid ? $image : null;
+        return $image;
     }
 
     /**
