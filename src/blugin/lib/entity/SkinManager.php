@@ -29,8 +29,8 @@ namespace blugin\lib\entity;
 
 use pocketmine\entity\InvalidSkinException;
 use pocketmine\entity\Skin;
-use pocketmine\network\mcpe\convert\SkinAdapterSingleton;
 use pocketmine\network\mcpe\protocol\types\SkinData;
+use pocketmine\network\mcpe\protocol\types\SkinImage;
 
 abstract class SkinManager{
     /** @var int[][] */
@@ -46,7 +46,7 @@ abstract class SkinManager{
     private static $geometryName = [];
     /** @var string[] */
     private static $geometryData = [];
-    /** @var Skin[] */
+    /** @var SkinData[] */
     private static $skinCache = [];
 
     /**
@@ -74,17 +74,15 @@ abstract class SkinManager{
 
     /**
      * @param string $key
-     * @param bool   $toSkinData
      *
      * @return Skin|SkinData
      */
-    public static function get(string $key, $toSkinData = false){
+    public static function get(string $key){
         //Create if there is no cached Skin instance
         if(!isset(self::$skinCache[$key])){
-            self::$skinCache[$key] = new Skin($key, self::$skinData[$key], "", self::$geometryName[$key], self::$geometryData[$key]);
+            self::$skinCache[$key] = new SkinData($key, json_encode(["geometry" => ["default" => self::$geometryName[$key]]]), SkinImage::fromLegacy(self::$skinData[$key]), [], null, self::$geometryData[$key]);
         }
-        $skin = clone self::$skinCache[$key];
-        return $toSkinData ? SkinAdapterSingleton::get()->toSkinData($skin) : $skin;
+        return clone self::$skinCache[$key];
     }
 
     /**
