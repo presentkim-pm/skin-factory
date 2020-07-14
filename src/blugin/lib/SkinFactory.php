@@ -43,14 +43,8 @@ class SkinFactory extends PluginBase{
         128 * 128 * 4 => [128, 128]
     ];
 
-    /** @var string[] */
-    public static $skinData = [];
-    /** @var string[] */
-    private static $geometryName = [];
-    /** @var string[] */
-    private static $geometryData = [];
     /** @var SkinData[] */
-    private static $skinCache = [];
+    private static $skinData = [];
 
     /**
      * Called when the plugin is loaded, before calling onEnable()
@@ -61,38 +55,27 @@ class SkinFactory extends PluginBase{
 
     /**
      * @param string      $key
-     * @param string      $geometryData
-     * @param null|string $geometryName = null
-     */
-    public static function registerGeometry(string $key, string $geometryData, string $geometryName = null) : void{
-        self::$geometryData[$key] = $geometryData;
-        self::$geometryName[$key] = $geometryName ?? self::getGeometryNameFromData(json_decode($geometryData, true));
-        //Removes cached Skin instance when skin changes
-        unset(self::$skinCache[$key]);
-    }
-
-    /**
-     * @param string $key
      * @param string $skinData
+     * @param string      $geometryData
      */
-    public static function registerSkin(string $key, string $skinData) : void{
-        self::$skinData[$key] = $skinData;
-
-        //Removes cached Skin instance when skin changes
-        unset(self::$skinCache[$key]);
+    public static function register(string $key, string $skinData, string $geometryData) : void{
+        self::$skinData[$key] = new SkinData(
+            $key,
+            json_encode(["geometry" => ["default" => self::getGeometryNameFromData(json_decode($geometryData, true))]]),
+            SkinImage::fromLegacy($skinData),
+            [],
+            null,
+            $geometryData
+        );
     }
 
     /**
      * @param string $key
      *
-     * @return SkinData
+     * @return null|SkinData
      */
-    public static function get(string $key) : SkinData{
-        //Create if there is no cached Skin instance
-        if(!isset(self::$skinCache[$key])){
-            self::$skinCache[$key] = new SkinData($key, json_encode(["geometry" => ["default" => self::$geometryName[$key]]]), SkinImage::fromLegacy(self::$skinData[$key]), [], null, self::$geometryData[$key]);
-        }
-        return clone self::$skinCache[$key];
+    public static function get(string $key) : ?SkinData{
+        return self::$skinData[$key] ?? null;
     }
 
     /**
