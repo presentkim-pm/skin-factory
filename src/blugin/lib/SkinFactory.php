@@ -59,6 +59,16 @@ class SkinFactory extends PluginBase{
      */
     public function registerImage(string $key, SkinImage $skinImage) : void{
         $this->skinImages[$key] = $skinImage;
+
+        //Remove cached skin data
+        $haystack = array_keys($this->cachedSkinData);
+        $needle = "$key\\";
+        for($i = 0, $count = count($haystack), $length = strlen($needle); $i < $count; ++$i){
+            if(substr($haystack[$i], 0, $length) === $needle){
+                unset($this->cachedSkinData[$haystack[$i]]);
+                break;
+            }
+        }
     }
 
     /**
@@ -84,6 +94,16 @@ class SkinFactory extends PluginBase{
      */
     public function registerGeometry(string $key, string $geometryData) : void{
         $this->geometryDatas[$key] = $geometryData;
+
+        //Remove cached skin data
+        $haystack = array_keys($this->cachedSkinData);
+        $needle = "\\$key";
+        for($i = 0, $count = count($haystack), $length = strlen($needle); $i < $count; ++$i){
+            if(substr($haystack[$i], -$length) === $needle){
+                unset($this->cachedSkinData[$haystack[$i]]);
+                break;
+            }
+        }
     }
 
     /**
