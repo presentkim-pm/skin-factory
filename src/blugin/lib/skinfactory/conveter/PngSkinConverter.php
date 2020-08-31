@@ -25,7 +25,7 @@
 
 declare(strict_types=1);
 
-namespace blugin\lib\conveter;
+namespace blugin\lib\skinfactory\conveter;
 
 use pocketmine\entity\InvalidSkinException;
 use pocketmine\network\mcpe\protocol\types\SkinData;

@@ -25,9 +25,9 @@
 
 declare(strict_types=1);
 
-namespace blugin\lib;
+namespace blugin\lib\skinfactory;
 
-use blugin\lib\conveter\PngSkinConverter;
+use blugin\lib\skinfactory\conveter\PngSkinConverter;
 use pocketmine\entity\InvalidSkinException;
 use pocketmine\network\mcpe\protocol\types\SkinData;
 use pocketmine\network\mcpe\protocol\types\SkinImage;
