@@ -32,11 +32,16 @@ use pocketmine\entity\InvalidSkinException;
 use pocketmine\network\mcpe\protocol\types\SkinData;
 use pocketmine\network\mcpe\protocol\types\SkinImage;
 use pocketmine\plugin\PluginBase;
-use pocketmine\utils\SingletonTrait;
 use pocketmine\utils\VersionString;
 
 class SkinFactory extends PluginBase{
-    use SingletonTrait;
+    /** @var SkinFactory */
+    private static $instance = null;
+
+    /** @return SkinFactory */
+    public static function getInstance() : SkinFactory{
+        return self::$instance;
+    }
 
     /** @var SkinImage[] key => skin image */
     private $skinImages = [];
@@ -50,7 +55,7 @@ class SkinFactory extends PluginBase{
      * Called when the plugin is loaded, before calling onEnable()
      */
     public function onLoad() : void{
-        self::setInstance($this);
+        self::$instance = $this;
     }
 
     /**

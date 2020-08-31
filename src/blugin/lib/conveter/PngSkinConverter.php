@@ -30,10 +30,19 @@ namespace blugin\lib\conveter;
 use pocketmine\entity\InvalidSkinException;
 use pocketmine\network\mcpe\protocol\types\SkinData;
 use pocketmine\network\mcpe\protocol\types\SkinImage;
-use pocketmine\utils\SingletonTrait;
 
 class PngSkinConverter{
-    use SingletonTrait;
+    /** @var PngSkinConverter */
+    private static $instance = null;
+
+    /** @return PngSkinConverter */
+    public static function getInstance() : PngSkinConverter{
+        if(self::$instance === null){
+            self::$instance = new self();
+        }
+
+        return self::$instance;
+    }
 
     /**
      * @param resource $image
