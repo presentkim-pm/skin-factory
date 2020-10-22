@@ -115,6 +115,10 @@ trait HumanoidTrait{
         return $this->getOffsetPosition($vector3)->subtract(0, $this->getBaseOffset(), 0);
     }
 
+    public function getSkinData() : SkinData{
+        return $this->skinData;
+    }
+
     public function setSkin(SkinData $skinData) : void{
         $this->skinData = $skinData;
         $this->sendSkin();
