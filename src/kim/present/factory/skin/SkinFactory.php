@@ -2,21 +2,18 @@
 
 /*
  *
- *  ____  _             _         _____
- * | __ )| |_   _  __ _(_)_ __   |_   _|__  __ _ _ __ ___
- * |  _ \| | | | |/ _` | | '_ \    | |/ _ \/ _` | '_ ` _ \
- * | |_) | | |_| | (_| | | | | |   | |  __/ (_| | | | | | |
- * |____/|_|\__,_|\__, |_|_| |_|   |_|\___|\__,_|_| |_| |_|
- *                |___/
+ *  ____                           _   _  ___
+ * |  _ \ _ __ ___  ___  ___ _ __ | |_| |/ (_)_ __ ___
+ * | |_) | '__/ _ \/ __|/ _ \ '_ \| __| ' /| | '_ ` _ \
+ * |  __/| | |  __/\__ \  __/ | | | |_| . \| | | | | | |
+ * |_|   |_|  \___||___/\___|_| |_|\__|_|\_\_|_| |_| |_|
  *
  * This program is free software: you can redistribute it and/or modify
- * it under the terms of the GNU Lesser General Public License as published by
- * the Free Software Foundation, either version 3 of the License, or
- * (at your option) any later version.
+ * it under the terms of the MIT License. see <https://opensource.org/licenses/MIT>.
  *
- * @author  Blugin team
- * @link    https://github.com/Blugin
- * @license https://www.gnu.org/licenses/lgpl-3.0 LGPL-3.0 License
+ * @author  PresentKim (debe3721@gmail.com)
+ * @link    https://github.com/PresentKim
+ * @license https://opensource.org/licenses/MIT MIT License
  *
  *   (\ /)
  *  ( . .) ♥
@@ -25,21 +22,21 @@
 
 declare(strict_types=1);
 
-namespace blugin\lib;
+namespace kim\present\factory\skin;
 
-use blugin\lib\conveter\PngSkinConverter;
+use kim\present\converter\png\PngConverter;
+use kim\present\traits\singleton\SingletonTrait;
 use pocketmine\entity\InvalidSkinException;
 use pocketmine\network\mcpe\protocol\types\SkinData;
 use pocketmine\network\mcpe\protocol\types\SkinImage;
-use pocketmine\plugin\PluginBase;
-use pocketmine\utils\SingletonTrait;
 use pocketmine\utils\VersionString;
 
-class SkinFactory extends PluginBase{
+class SkinFactory{
     use SingletonTrait;
 
     /** @var SkinImage[] key => skin image */
     private $skinImages = [];
+
     /** @var string[] key => geometry data */
     private $geometryDatas = [];
 
@@ -50,7 +47,7 @@ class SkinFactory extends PluginBase{
      * Called when the plugin is loaded, before calling onEnable()
      */
     public function onLoad() : void{
-        self::setInstance($this);
+        self::$instance = $this;
     }
 
     /**
@@ -76,7 +73,7 @@ class SkinFactory extends PluginBase{
      * @param string $filepath
      */
     public function registerImageFromFile(string $key, string $filepath) : void{
-        $this->registerImage($key, PngSkinConverter::getInstance()->toSkinImage(imagecreatefrompng($filepath)));
+        $this->registerImage($key, PngConverter::toSkinImage(imagecreatefrompng($filepath)));
     }
 
     /**
@@ -156,7 +153,7 @@ class SkinFactory extends PluginBase{
      *
      * @throw InvalidSkinException
      */
-    public function getGeometryNameFromData(array $data) : string{
+    public static function getGeometryNameFromData(array $data) : string{
         $formatVersion = $data["format_version"] ?? null;
         $keys = array_keys($data);
         if($formatVersion === null){
