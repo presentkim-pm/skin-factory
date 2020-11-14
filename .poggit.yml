@@ -1,0 +1,15 @@
+--- # Poggit-CI Manifest. Open the CI at https://poggit.pmmp.io/ci/PresentKim/skin-factory
+branches:
+  - main
+projects:
+  skin-factory:
+    model: virion
+    type: library
+    lint:
+      phpstan: false
+    libs:
+      - src: PresentKim/png-converter/png-converter
+        version: ^1.0.2
+      - src: PresentKim/singleton-trait/singleton-trait
+        version: ^2.0.0
+...
