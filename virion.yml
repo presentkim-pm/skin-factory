@@ -1,8 +1,8 @@
 ---
 name: skin-factory
 antigen: kim\present\factory\skin
-version: 1.0.0
-api: 3.0.0
+version: 1.0.1
+api: 4.0.0
 authors: [PresentKim, Blugin-team]
 description: Factory to create Skin instance and caching it
 ...

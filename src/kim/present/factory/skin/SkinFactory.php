@@ -1,6 +1,6 @@
 <?php
 
-/*
+/**
  *
  *  ____                           _   _  ___
  * |  _ \ _ __ ___  ___  ___ _ __ | |_| |/ (_)_ __ ___
@@ -18,34 +18,35 @@
  *   (\ /)
  *  ( . .) ♥
  *  c(")(")
+ *
+ * @noinspection PhpUnused
  */
 
 declare(strict_types=1);
 
 namespace kim\present\factory\skin;
 
+use Exception;
 use kim\present\converter\png\PngConverter;
-use kim\present\traits\singleton\SingletonTrait;
 use pocketmine\entity\InvalidSkinException;
-use pocketmine\network\mcpe\protocol\types\SkinData;
-use pocketmine\network\mcpe\protocol\types\SkinImage;
+use pocketmine\network\mcpe\protocol\types\skin\SkinData;
+use pocketmine\network\mcpe\protocol\types\skin\SkinImage;
+use pocketmine\utils\SingletonTrait;
 use pocketmine\utils\VersionString;
 
 class SkinFactory{
     use SingletonTrait;
 
-    /** @var SkinImage[] key => skin image */
-    private $skinImages = [];
+    /** @var array<string, SkinImage> key => skin image */
+    private array $skinImages = [];
 
-    /** @var string[] key => geometry data */
-    private $geometryDatas = [];
+    /** @var array<string, string> key => geometry data */
+    private array $geometries = [];
 
-    /** @var SkinData[] key => cached skin data instance */
-    private $cachedSkinData = [];
+    /** @var array<string, SkinData> key => cached skin data instance */
+    private array $caches = [];
 
-    /**
-     * Called when the plugin is loaded, before calling onEnable()
-     */
+    /** Called when the plugin is loaded, before calling onEnable() */
     public function onLoad() : void{
         self::$instance = $this;
     }
@@ -58,11 +59,11 @@ class SkinFactory{
         $this->skinImages[$key] = $skinImage;
 
         //Remove cached skin data
-        $haystack = array_keys($this->cachedSkinData);
+        $haystack = array_keys($this->caches);
         $needle = "$key\\";
         for($i = 0, $count = count($haystack), $length = strlen($needle); $i < $count; ++$i){
             if(substr($haystack[$i], 0, $length) === $needle){
-                unset($this->cachedSkinData[$haystack[$i]]);
+                unset($this->caches[$haystack[$i]]);
                 break;
             }
         }
@@ -90,14 +91,14 @@ class SkinFactory{
      * @param string $geometryData
      */
     public function registerGeometry(string $key, string $geometryData) : void{
-        $this->geometryDatas[$key] = $geometryData;
+        $this->geometries[$key] = $geometryData;
 
         //Remove cached skin data
-        $haystack = array_keys($this->cachedSkinData);
+        $haystack = array_keys($this->caches);
         $needle = "\\$key";
         for($i = 0, $count = count($haystack), $length = strlen($needle); $i < $count; ++$i){
             if(substr($haystack[$i], -$length) === $needle){
-                unset($this->cachedSkinData[$haystack[$i]]);
+                unset($this->caches[$haystack[$i]]);
                 break;
             }
         }
@@ -117,7 +118,7 @@ class SkinFactory{
      * @return string|null
      */
     public function getGeometry(string $key) : ?string{
-        return $this->geometryDatas[$key] ?? null;
+        return $this->geometries[$key] ?? null;
     }
 
     /**
@@ -134,16 +135,16 @@ class SkinFactory{
         if(!$geometryDataKey){
             $geometryDataKey = $skinImageKey;
         }
-        $geometryData = $this->geometryDatas[$geometryDataKey] ?? null;
+        $geometryData = $this->geometries[$geometryDataKey] ?? null;
         if(!$geometryData)
             return null;
 
         $cacheKey = "$skinImageKey\\$geometryDataKey";
-        if(!isset($this->cachedSkinData[$cacheKey])){
+        if(!isset($this->caches[$cacheKey])){
             $resourcePatch = json_encode(["geometry" => ["default" => self::getGeometryNameFromData(json_decode($geometryData, true))]]);
-            $this->cachedSkinData[$cacheKey] = new SkinData($skinImageKey, $resourcePatch, $skinImage, [], null, $geometryData);
+            $this->caches[$cacheKey] = new SkinData($skinImageKey, "", $resourcePatch, $skinImage, [], null, $geometryData);
         }
-        return clone $this->cachedSkinData[$cacheKey];
+        return clone $this->caches[$cacheKey];
     }
 
     /**
@@ -169,7 +170,7 @@ class SkinFactory{
             }else{
                 return $data["minecraft:geometry"][0]["description"]["identifier"];
             }
-        }catch(\Exception $e){
+        }catch(Exception){
             throw new InvalidSkinException("Invalid geometry data (format_version: $formatVersion)");
         }
     }
