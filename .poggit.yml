@@ -8,6 +8,6 @@ projects:
     lint:
       phpstan: false
     libs:
-      - src: PresentKim/png-converter/png-converter
+      - src: PresentKim/png-converter/png-converter-pm4
         version: ^1.0.3
 ...
