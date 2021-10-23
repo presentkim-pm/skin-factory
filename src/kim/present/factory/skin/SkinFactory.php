@@ -34,6 +34,15 @@ use pocketmine\network\mcpe\protocol\types\skin\SkinImage;
 use pocketmine\utils\SingletonTrait;
 use pocketmine\utils\VersionString;
 
+use function array_keys;
+use function count;
+use function file_get_contents;
+use function imagecreatefrompng;
+use function json_decode;
+use function json_encode;
+use function strlen;
+use function substr;
+
 class SkinFactory{
     use SingletonTrait;
 
@@ -51,10 +60,6 @@ class SkinFactory{
         self::$instance = $this;
     }
 
-    /**
-     * @param string    $key
-     * @param SkinImage $skinImage
-     */
     public function registerImage(string $key, SkinImage $skinImage) : void{
         $this->skinImages[$key] = $skinImage;
 
@@ -69,27 +74,14 @@ class SkinFactory{
         }
     }
 
-    /**
-     * @param string $key
-     * @param string $filepath
-     */
     public function registerImageFromFile(string $key, string $filepath) : void{
         $this->registerImage($key, PngConverter::toSkinImage(imagecreatefrompng($filepath)));
     }
 
-    /**
-     * @param string $key
-     *
-     * @return SkinImage|null
-     */
     public function getImage(string $key) : ?SkinImage{
         return $this->skinImages[$key] ?? null;
     }
 
-    /**
-     * @param string $key
-     * @param string $geometryData
-     */
     public function registerGeometry(string $key, string $geometryData) : void{
         $this->geometries[$key] = $geometryData;
 
@@ -104,29 +96,14 @@ class SkinFactory{
         }
     }
 
-    /**
-     * @param string $key
-     * @param string $filepath
-     */
     public function registerGeometryFromFile(string $key, string $filepath) : void{
         $this->registerGeometry($key, file_get_contents($filepath));
     }
 
-    /**
-     * @param string $key
-     *
-     * @return string|null
-     */
     public function getGeometry(string $key) : ?string{
         return $this->geometries[$key] ?? null;
     }
 
-    /**
-     * @param string      $skinImageKey
-     * @param null|string $geometryDataKey = null
-     *
-     * @return null|SkinData
-     */
     public function get(string $skinImageKey, ?string $geometryDataKey = null) : ?SkinData{
         $skinImage = $this->skinImages[$skinImageKey] ?? null;
         if(!$skinImage)
@@ -147,13 +124,7 @@ class SkinFactory{
         return clone $this->caches[$cacheKey];
     }
 
-    /**
-     * @param array $data
-     *
-     * @return string
-     *
-     * @throw InvalidSkinException
-     */
+    /** @throw InvalidSkinException */
     public static function getGeometryNameFromData(array $data) : string{
         $formatVersion = $data["format_version"] ?? null;
         $keys = array_keys($data);

@@ -1,6 +1,7 @@
---- # Poggit-CI Manifest. Open the CI at https://poggit.pmmp.io/ci/PresentKim/skin-factory
+---
 branches:
   - pm4
+  -
 projects:
   skin-factory-pm4:
     model: virion
